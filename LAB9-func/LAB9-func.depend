@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1303556985 source:g:\tsu\2sem\lab9-func\main.c
+	<stdio.h>
+	<ctype.h>
+	"messages.h"
+
+1303556781 g:\tsu\2sem\lab9-func\messages.h
+

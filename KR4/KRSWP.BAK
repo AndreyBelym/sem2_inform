@@ -1,0 +1,291 @@
+uses dos;
+CONST  WordLen = 31;
+TYPE  TextWord = string[WordLen];
+    Node= RECORD
+            key: TextWord;
+            count:longint;
+            left, right: LongInt
+    END;
+    TreeFile=file of Node;
+
+    function IsLetter(ch:char):boolean;
+    begin
+         if ('A'<=ch) and (ch<='Z') or
+            ('a'<=ch) and (ch<='z') or
+            ('А'<=ch) and (ch<='п') or
+            ('р'<=ch) and (ch<='ё')
+               then IsLetter:=true
+               else IsLetter:=false;
+    end;
+
+    function IsInWordSymbol(ch:char):boolean;
+    begin
+         if ('0'<=ch) and (ch<='9')
+            or (ch='''')  or (ch='-') or (ch='_')
+                then IsInWordSymbol:=true
+                else IsInWordSymbol:=false;
+    end;
+
+    function cap(const ch:char):char;
+    begin
+         case ch of
+         'a'..'z':cap:=UpCase(ch);
+         'а'..'п':cap:=chr(ord(ch)-32);
+         'р'..'я':cap:=chr(ord(ch)-80);
+         'ё':cap:='Ё';
+         else cap:=ch;
+         end;
+    end;
+
+    function Compare(const a,b:string):shortint;
+    var lena,lenb,len:byte;
+       i:byte;equal:boolean;
+    begin
+         lena:=length(a); lenb:=length(b);
+         if lena > lenb then len:=lenb else len:=lena;
+         i:=1;
+         while (i<=len) and (a[i]=b[i]) do begin
+               inc(i);
+         end;
+
+         if i>len then begin
+            if lena=lenb then
+               Compare:=0
+            else if lena<lenb then
+                    Compare:=-1
+                  else Compare:=1;
+         end else begin
+             if a[i] <>'Ё' then
+                if a[i]<b[i] then
+                    Compare:=-1
+                  else Compare:=1
+             else
+                 if b[i]<='Е' then
+                    Compare:=1
+                 else
+                     Compare:=-1;
+         end;
+
+    end;
+
+    PROCEDURE PrintTree(var Tree:TreeFile; var outFile:Text);
+    procedure RecPrint(Number: Longint);
+    var Current:Node;
+    BEGIN
+        seek(Tree,Number); Read(Tree,Current);
+
+        IF  Current.left>0 Then begin
+            RecPrint(Current.left);
+        end;
+        WriteLn( outFile, Current.key,' ',Current.count);
+        IF  Current.right>0 Then begin
+            RecPrint(Current.right);
+    end;
+    END {Tabulate};
+    begin
+         recprint(0);
+    end;
+
+    function GetWord(var inFile:text):TextWord;
+    var temp:TextWord;founded:boolean;ch:char;i:integer;
+    begin
+        temp:='';
+        founded:=false;i:=0;
+        while not (eof(inFile) or founded) do begin
+            Read(inFile,ch);
+            IF IsLetter(ch) THEN BEGIN
+                founded:=true;inc(i); temp[i] := cap(ch);Read(inFile,ch);
+
+                while not eof(inFile) and (i <= WordLen)
+                      and (IsLetter(ch) or IsInWordSymbol(ch)) do begin
+                    inc(i); temp[i] := cap(ch);
+                    Read(inFile,ch);
+
+                end;
+                if  IsLetter(ch) or IsInWordSymbol(ch) then begin
+                    inc(i); temp[i] := cap(ch);
+                end;
+                temp[0] := chr(i); (* конец цепочки литер *)
+            END;
+
+        end;
+        if founded then
+            GetWord:=temp
+        else
+            GetWord:='';
+
+    end;
+
+    PROCEDURE MergeTree( VAR inFile: text; var Tree:TreeFile );
+
+    PROCEDURE AddKey(var Tree:TreeFile; const key: TextWord;var FreeIndex:longint;var fileinit:boolean);
+    var TempNode:Node;
+        Rider,PrevRider:longint; founded:boolean;status:shortint;
+    BEGIN
+        {**Root node position**}
+        seek(Tree,0);
+        if FileInit then begin {**File initialized**}
+            {**Read root node**}
+            Rider:=0;
+            founded:=false;
+            repeat
+                PrevRider:=Rider;
+                seek(Tree,Rider);Read(Tree,TempNode);
+                status:=Compare(key,TempNode.key);
+                Case status of
+                    1:Rider:=TempNode.right;
+                    -1:Rider:=TempNode.left;
+                    0:begin
+                        Rider:=0;
+                    end;
+                end;
+            until Rider<=0;
+            if Rider=0 then begin
+                inc(TempNode.Count);
+                seek(Tree,PrevRider);write(Tree,TempNode);
+            end else begin
+                {**Prepare and write parent node**}
+                seek(Tree,PrevRider);
+                Case Rider of
+                    -1:TempNode.right:=FreeIndex;
+                    -2:TempNode.left:=FreeIndex;
+                End;
+                write(Tree,TempNode);
+                {**Prepare and write new child node**}
+                TempNode.key:=key; TempNode.count:=1;
+                TempNode.right:=-1; TempNode.left:=-2;
+                seek(Tree,FreeIndex);write(Tree,TempNode);
+                inc(FreeIndex);
+            end;
+        end else begin
+            {**Prepare and write root node**}
+            FreeIndex:=0;
+            TempNode.key:=key; TempNode.count:=1;
+            TempNode.right:=-1; TempNode.left:=-2;
+            seek(Tree,FreeIndex);write(Tree,TempNode);
+            inc(FreeIndex); fileinit:=true;
+        end;
+    END {AddKey};
+
+    VAR
+        key: TextWord; fileinit:boolean;FreeIndex:longint;
+    BEGIN
+        FreeIndex:=0;Fileinit:=false;
+        key:=GetWord(inFile);
+        WHILE (key<>'') DO begin
+            AddKey(Tree,key,FreeIndex,fileinit);
+            key:=GetWord(inFile);
+        END;
+    END {MergeTree};
+    (* конец фрагмента. ****************************************************************)
+
+function FileExist(var f:TreeFile):boolean;
+begin
+     {$I-}
+          Reset(f);
+     {$I+}
+     if ioresult=0 then begin
+
+        FileExist:=true;
+        Close(f);
+     end else Fileexist:=false
+end;
+
+function GetFiles(var inFile:text; var Tree:TreeFile; var outFile:text):boolean;
+
+function GetSourceFile(var f:text):boolean;
+var ch:char;error:integer;
+    fileName:string;
+begin
+    repeat
+        WriteLn('Введите имя файла с текстом для анализа.');
+        Write('Файл:');ReadLn(fileName);
+        Assign(f,fileName);
+        {$I-}
+            Reset(f);
+        {$I+}
+        error:=ioresult;
+        if error<>0 then begin
+            WriteLn('Неправильное имя файла! Повторить ввод? <Y>/<N>');
+            ReadLn(ch);
+        end;
+    until (UpCase(ch)='N') or (error=0);
+    GetSourceFile:=error=0;
+end;
+
+function GetInputFile(var f:TreeFile):boolean;
+const DefaultName='$temp.tmp';
+var ch:char; error:integer;
+    fileName:string;
+begin
+    FileName:=DefaultName;
+    repeat
+        assign(f,fileName);
+        If FileExist(f) then begin
+           WriteLn('Введите имя временного файла');
+           Write('Файл:');ReadLn(fileName);
+        end else begin
+           {$I-}
+                ReWrite(f);
+           {$I+}
+           error:=ioresult;
+           if error<>0 then begin
+               WriteLn('Ошибка при создании файла! Повторить ввод? <Y>/<N>');
+               ReadLn(ch);
+           end;
+        end;
+    until (UpCase(ch)='N') or (error=0);
+    GetInputFile:=error=0;
+end;
+
+function GetOutputFile(var f:text):boolean;
+var ch:char; error:integer;
+    fileName:string;
+begin
+    repeat
+        WriteLn('Введите имя файла для частотного словаря.');
+        Write('Файл:');ReadLn(fileName);
+        Assign(f,fileName);
+        {$I-}
+            ReWrite(f);
+        {$I+}
+        error:=ioresult;
+        if error<>0 then begin
+            WriteLn('Ошибка при создании файла! Повторить ввод? <Y>/<N>');
+            ReadLn(ch);
+        end;
+    until (UpCase(ch)='N') or (error=0);
+    GetOutputFile:=error=0;
+end;
+var status:boolean;
+begin
+    status:=GetSourceFile(inFile);
+    if status then
+        status:=GetInputFile(Tree);
+    if status then
+        status:=GetOutputFile(outFile);
+    GetFiles:=status;
+end;
+VAR  inFile, outFile: Text;
+     Tree: TreeFile; status:boolean;i:byte;
+BEGIN
+    WriteLn('Программа составляет алфавитный частотный словарь');
+    WriteLn('из файла, записанного в текстовом файле,');
+    WriteLn('и выводит словарь в выходной текстовый файл');
+    status:=GetFiles(inFile, Tree, outFile);
+    if status then begin
+       writeln('Обработка входного текста... ');
+       writeln('Пожалуйста, подождите...');
+       MergeTree(InFile,Tree);
+       WriteLn;
+       writeLn('Запись результатов...');
+       writeln('Пожалуйста, подождите...');
+       PrintTree(Tree,outFile);
+       Close(inFile); close(outFile);
+       close(Tree); Erase(Tree);
+       WriteLn;
+       WriteLn('Все операции завершены успешно!')
+    end else
+       WriteLn('Работа программы прервана...');
+    WriteLn('Нажмите <Enter>...');Readln;
+END.

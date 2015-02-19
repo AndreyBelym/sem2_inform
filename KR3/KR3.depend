@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1303757542 source:g:\tsu\2sem\kr3\main.c
+	<stdio.h>
+	<stdlib.h>
+	"messages.h"
+	<ctype.h>
+	<time.h>
+
+1303757401 g:\tsu\2sem\kr3\messages.h
+

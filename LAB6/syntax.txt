@@ -1,0 +1,3 @@
+\<(procedure|function|if|then|else|for|do|to|while|repeat|until|and|or|not)\>
+\<(boolean|byte|integer|longint|char|string|array|of|file|text)\>
+\<(const|var|type|begin|end)\>

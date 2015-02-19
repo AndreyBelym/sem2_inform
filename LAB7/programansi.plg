@@ -1,0 +1,57 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: programansi - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\Wolf\LOCALS~1\Temp\RSP11.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Debug/programansi.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"E:\TSU\2sem\LAB7\programansi.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\Wolf\LOCALS~1\Temp\RSP11.tmp" 
+Creating temporary file "C:\DOCUME~1\Wolf\LOCALS~1\Temp\RSP12.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"Debug/programansi.pdb" /debug /machine:I386 /out:"Debug/programansi.exe" /pdbtype:sept 
+.\Debug\programansi.obj
+]
+Creating command line "link.exe @C:\DOCUME~1\Wolf\LOCALS~1\Temp\RSP12.tmp"
+<h3>Output Window</h3>
+Compiling...
+programansi.c
+E:\TSU\2sem\LAB7\programansi.c(9) : error C2143: syntax error : missing ';' before '{'
+E:\TSU\2sem\LAB7\programansi.c(15) : error C2065: 'f' : undeclared identifier
+E:\TSU\2sem\LAB7\programansi.c(15) : error C2100: illegal indirection
+E:\TSU\2sem\LAB7\programansi.c(15) : warning C4047: '=' : 'int ' differs in levels of indirection from 'struct _iobuf *'
+E:\TSU\2sem\LAB7\programansi.c(16) : error C2100: illegal indirection
+E:\TSU\2sem\LAB7\programansi.c(16) : warning C4047: '==' : 'int ' differs in levels of indirection from 'void *'
+E:\TSU\2sem\LAB7\programansi.c(26) : error C2143: syntax error : missing ';' before 'type'
+E:\TSU\2sem\LAB7\programansi.c(28) : error C2143: syntax error : missing ';' before 'type'
+E:\TSU\2sem\LAB7\programansi.c(28) : error C2143: syntax error : missing ';' before 'type'
+E:\TSU\2sem\LAB7\programansi.c(31) : error C2065: 'fileName' : undeclared identifier
+E:\TSU\2sem\LAB7\programansi.c(32) : error C2100: illegal indirection
+E:\TSU\2sem\LAB7\programansi.c(32) : warning C4047: 'function' : 'const char *' differs in levels of indirection from 'int '
+E:\TSU\2sem\LAB7\programansi.c(32) : warning C4024: 'fopen' : different types for formal and actual parameter 1
+E:\TSU\2sem\LAB7\programansi.c(32) : warning C4047: '=' : 'int ' differs in levels of indirection from 'struct _iobuf *'
+E:\TSU\2sem\LAB7\programansi.c(33) : error C2065: 'error' : undeclared identifier
+E:\TSU\2sem\LAB7\programansi.c(33) : error C2100: illegal indirection
+E:\TSU\2sem\LAB7\programansi.c(33) : warning C4047: '==' : 'int ' differs in levels of indirection from 'void *'
+E:\TSU\2sem\LAB7\programansi.c(36) : error C2065: 'ch' : undeclared identifier
+E:\TSU\2sem\LAB7\programansi.c(44) : error C2065: 'fin' : undeclared identifier
+E:\TSU\2sem\LAB7\programansi.c(44) : warning C4047: 'function' : 'struct _iobuf ** ' differs in levels of indirection from 'int '
+E:\TSU\2sem\LAB7\programansi.c(44) : warning C4024: 'GetInputFile' : different types for formal and actual parameter 1
+E:\TSU\2sem\LAB7\programansi.c(44) : error C2099: initializer is not a constant
+E:\TSU\2sem\LAB7\programansi.c(45) : error C2059: syntax error : 'if'
+E:\TSU\2sem\LAB7\programansi.c(48) : error C2059: syntax error : 'return'
+E:\TSU\2sem\LAB7\programansi.c(49) : error C2059: syntax error : '}'
+Error executing cl.exe.
+
+
+
+<h3>Results</h3>
+programansi.exe - 17 error(s), 8 warning(s)
+</pre>
+</body>
+</html>

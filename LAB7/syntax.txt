@@ -1,0 +1,3 @@
+\<#(include|define|ifdef|else|endif|elif)\>
+\<(if|else|for|do|while)\>
+\<(const|void|FILE|signed|unsigned|int|long|char|double|float)\>

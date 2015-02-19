@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1303583956 source:g:\tsu\2sem\lab9-recur\main.c
+	<stdio.h>
+	"messages.h"
+	<ctype.h>
+	<math.h>
+
+1303582314 g:\tsu\2sem\lab9-recur\messages.h
+

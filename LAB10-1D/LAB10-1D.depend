@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1306085968 source:e:\tsu\2sem\lab10-1d\main.c
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	<time.h>
+
+1305308656 e:\tsu\2sem\lab10-1d\messages.h
+
+1305552488 e:\tsu\2sem\lab10-1d\defines.h
+

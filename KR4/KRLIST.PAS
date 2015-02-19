@@ -1,0 +1,117 @@
+{$M 65520,0,650000}
+var count:longint;
+CONST  WordLen = 31;
+CONST  Alphabet = ['a'..'z','A'..'Z','А'..'п','р'..'ё'];
+       Capitals = ['A'..'Z','А'..'Я'];
+TYPE  Word = string[WordLen];
+      Node = ^TList;
+    TList = record
+          key:Word;
+          count:integer;
+          next:Node;
+    end;
+
+VAR  line: INTEGER;  WF: Text;
+    function cap(const ch:char):char;
+    begin
+         case ch of
+         'a'..'z':cap:=UpCase(ch);
+         'а'..'п':cap:=chr(ord(ch)-32);
+         'р'..'я':cap:=chr(ord(ch)-80);
+         'ё':cap:='Ё';
+         else cap:=ch;
+         end;
+    end;
+
+    function Compare(const a,b:string):shortint;
+    var lena,lenb,len:byte;
+       i:byte;equal:boolean;
+    begin
+         lena:=length(a); lenb:=length(b);
+         if lena > lenb then len:=lenb else len:=lena;
+         i:=1;
+         equal:=true;Compare:=0;
+         while (i<=len) and (a[i]=b[i]) do begin
+               inc(i);
+         end;
+
+         if i>len then begin
+            if lena=lenb then
+               Compare:=-1
+            else Compare:=ord(lena<lenb);
+         end else begin
+             if cap(a[i]) <>'Ё' then
+                Compare:=ord(a[i]<b[i])
+             else
+                 if b[i]<='Е' then
+                    Compare:=0
+                 else
+                     Compare:=1
+         end;
+
+    end;
+    Procedure searchlist(var w:node;var a:Word);
+    var w1:Node;
+    begin
+       w1:=w^.next;
+       if w1<>NIL then begin
+         if (Compare(w1^.key,a)<>-1) then begin
+            while (w1^.next <> NIL) and (Compare(w1^.next^.key,a)<>-1) do
+               w1:=w1^.next;
+            if w1^.next=NIL then begin
+               {inc(count);writeln(wf,count,' added!');flush(wf);}
+               NEW(w1^.next);w1^.next^.key:=a;w1^.next^.count:=1;w1^.next^.next:=nil;
+            end else inc(w1^.next^.count);
+         end else inc(w1^.count);
+       end else begin
+         {inc(count);writeln(wf,count,' added!');flush(wf);}
+
+         NEW(w^.next);w^.next^.key:=a;w^.next^.count:=1;w^.next^.next:=nil;
+       end;
+    end;
+
+    PROCEDURE Tabulate ( w: Node );
+    BEGIN
+        while w<>NIL do begin
+           Writeln(wf,w^.key,' ',w^.count);
+           w:=w^.next;
+        end;
+
+    END {Tabulate};
+
+    PROCEDURE CrossRef ( VAR R: text );
+        VAR  root: Node;  (* используется глобальный объект печати WF *)
+            i: INTEGER;  ch: CHAR;  w: Word;
+    BEGIN
+
+        New(root);  line := 0;
+        Read( R, ch );
+        WHILE  not eof(R)  DO begin
+            IF  ch = #13  THEN BEGIN (*конец строки*)
+                INC( line );
+                Read( R, ch )
+            end ELSE IF ch in Alphabet THEN BEGIN
+                i := 1;
+                REPEAT
+                    IF  i < WordLen  THEN BEGIN  w[ i ] := cap(ch);  INC( i )  END;
+                    Read( R, ch )
+                UNTIL (i = WordLen) OR not(ch in Alphabet);
+
+                w[0] := chr(i-1); (* конец цепочки литер *)
+                searchlist( root, w )
+            END ELSE BEGIN
+                Read( R, ch )
+            END;
+        END;
+        Tabulate( root^.next );{flush(wf);}
+    END {CrossRef};
+    (* конец фрагмента. ****************************************************************)
+
+
+VAR  R: text;
+BEGIN
+    count:=0;
+    Assign(R,'voina.txt'); Assign(WF,'testlist.txt');
+    Reset(R); Rewrite(WF);
+    CrossRef(R);WriteLn('OK!');Readln;Close(wf)
+END.

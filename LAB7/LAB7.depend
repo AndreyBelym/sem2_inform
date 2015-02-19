@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1300725974 source:e:\tsu\2sem\lab7\program.c
+	<stdio.h>
+	<ctype.h>
+
+1301160419 source:g:\tsu\2sem\lab7\program.c
+	<stdio.h>
+	<ctype.h>
+	<limits.h>
+
